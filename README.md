@@ -10,3 +10,9 @@
 | DC          | P27       | Data/Command, low for command, high for data        |
 | RST         | P26       | Reset, low active                                   |
 | BUSY        | P25       | Busy status output pin (indicating busy)           |
+
+
+### Compile & flash to esp32
+```
+esphome run template.yaml
+```

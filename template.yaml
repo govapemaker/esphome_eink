@@ -1,0 +1,53 @@
+esphome:
+  name: esp32-eink
+
+esp32:
+  board: esp32dev
+
+wifi:
+  ssid: "your wifi name"
+  password: "password wifi"
+
+  ap:
+    ssid: "esp32-eink-fallback"
+    password: "fallback123"
+
+captive_portal:
+
+logger:
+
+api:
+
+ota:
+  platform: esphome
+
+# Giao tiếp SPI với màn hình e-Paper
+spi:
+  clk_pin: GPIO13
+  mosi_pin: GPIO14
+
+# Màn hình e-Paper 2.9" SSD1608
+display:
+  - platform: waveshare_epaper
+    cs_pin: GPIO15        # Nếu muốn an toàn hơn, có thể đổi sang GPIO5
+    dc_pin: GPIO27
+    busy_pin: GPIO25
+    reset_pin: GPIO26
+    model: 2.90in         # ✅ Model đúng cho SSD1608
+    rotation: 270         # ✅ Hiển thị nằm ngang (xoay 270 độ)
+    full_update_every: 30
+    lambda: |-
+      it.print(10, 10, id(my_font), "Hello, ESPHome!");
+      it.strftime(10, 30, id(my_font), "%d-%m-%Y %H:%M", id(esptime).now());
+
+# Font chữ (file ARIAL.TTF phải nằm cùng thư mục với file .yaml)
+font:
+  - file: "ARIAL.TTF"
+    id: my_font
+    size: 20
+
+# Lấy thời gian từ NTP (không cần Home Assistant)
+time:
+  - platform: sntp
+    id: esptime
+    timezone: Asia/Ho_Chi_Minh

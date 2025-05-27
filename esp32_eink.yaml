@@ -1,0 +1,72 @@
+esphome:
+  name: esp32-eink
+
+esp32:
+  board: esp32dev
+
+wifi:
+  ssid: "govapemaker"
+  password: "12345678A"
+  ap:
+    ssid: "esp32-eink-fallback"
+    password: "fallback123"
+
+captive_portal:
+
+logger:
+
+api:
+
+ota:
+  platform: esphome
+
+# Giao tiếp SPI với màn hình e-Paper
+spi:
+  clk_pin: GPIO13
+  mosi_pin: GPIO14
+
+# Màn hình e-Paper 2.9" SSD1608
+display:
+  - platform: waveshare_epaper
+    cs_pin: GPIO15
+    dc_pin: GPIO27
+    busy_pin: GPIO25
+    reset_pin: GPIO26
+    model: 2.90in
+    rotation: 270
+    full_update_every: 30
+    lambda: |-
+      it.print(10, 10, id(my_font), "Xin chào, ESPHome!");
+      it.strftime(10, 35, id(my_font), "%d-%m-%Y %H:%M", id(esptime).now());
+      if (id(dht_temp).has_state()) {
+        it.printf(10, 60, id(my_font), "Nhiệt độ: %.1f°C", id(dht_temp).state);
+      }
+      if (id(dht_humid).has_state()) {
+        it.printf(10, 85, id(my_font), "Độ ẩm: %.1f%%", id(dht_humid).state);
+      }
+
+# Font chữ hỗ trợ tiếng Việt (file ARIAL.TTF phải nằm cùng thư mục .yaml)
+font:
+  - file: "ARIAL.TTF"
+    id: my_font
+    size: 20
+    glyphs: " !\"#%()+=,-./0123456789:°ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzáàạảãâấầậẩẫăắằặẳẵéèẹẻẽêếềệểễíìịỉĩóòọỏõôốồộổỗơớờợởỡúùụủũưứừựửữýỳỵỷỹđĐ"
+
+# Lấy thời gian từ NTP
+time:
+  - platform: sntp
+    id: esptime
+    timezone: Asia/Ho_Chi_Minh
+
+# Cảm biến DHT22 (chân dữ liệu nối vào GPIO4)
+sensor:
+  - platform: dht
+    pin: GPIO4
+    model: DHT22
+    temperature:
+      name: "DHT22 Temperature"
+      id: dht_temp
+    humidity:
+      name: "DHT22 Humidity"
+      id: dht_humid
+    update_interval: 60s
